@@ -31,6 +31,9 @@ class App extends Component {
       }
     }, 1000);
   }
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
   getCurrencies() {
     console.log('start');
     axios.all([
