@@ -5,6 +5,9 @@ import { Panel, Row, Col } from "react-bootstrap";
 import { ClipLoader } from 'react-spinners';
 
 import './App.css';
+import bitcoinImg from './bitcoin.png';
+import litecoinImg from './litecoin.png';
+import ethereumImg from './ethereum.png';
 
 const http = axios.create({
   baseURL: `https://api.coinmarketcap.com/v2/`
@@ -60,14 +63,18 @@ class App extends Component {
         <div className="App-header">
           <h1>CryptoWallet</h1>
           <div className="App-card">
-            <div className="ClipLoader">
-              <ClipLoader
-                sizeUnit={"px"}
-                size={50}
-                color={'#CCCCC'}
-                loading={this.state.loading}
-              />
-          </div> 
+            { this.state.loading 
+              ? <div className="ClipLoader">
+                  <ClipLoader
+                    className="ClipLoader"
+                    sizeUnit={"px"}
+                    size={50}
+                    color={'#CCCCC'}
+                    loading={this.state.loading}
+                  />              
+                </div>
+              : null
+            }
             <Row>
               <Col xs={6} md={4}>
                 <Panel>
@@ -77,7 +84,12 @@ class App extends Component {
                       currency="USD"
                     />
                   </Panel.Body>
-                  <Panel.Footer><p><b>BTC</b></p></Panel.Footer>
+                  <Panel.Footer>
+                    <p>
+                      <img src={bitcoinImg} alt="bitcoin" />
+                      <b>BTC</b>
+                    </p>
+                  </Panel.Footer>
                 </Panel>
               </Col>
               <Col xs={6} md={4}>
@@ -88,7 +100,12 @@ class App extends Component {
                       currency="USD"
                     />
                   </Panel.Body>
-                  <Panel.Footer><p><b>ETH</b></p></Panel.Footer>
+                  <Panel.Footer>
+                    <p>
+                      <img src={ethereumImg} alt="bitcoin" />
+                      <b>ETH</b>
+                    </p>
+                  </Panel.Footer>
                 </Panel>
               </Col>
               <Col xsHidden md={4}>
@@ -99,7 +116,12 @@ class App extends Component {
                       currency="USD"
                     />
                   </Panel.Body>
-                  <Panel.Footer><p><b>LTC</b></p></Panel.Footer>
+                  <Panel.Footer>
+                    <p>
+                      <img src={litecoinImg} alt="bitcoin" />
+                      <b>LTC</b>
+                    </p>
+                  </Panel.Footer>
                 </Panel>
               </Col>
             </Row>
