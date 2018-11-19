@@ -1,29 +1,29 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import axios from 'axios';
-import { Row, Col } from 'react-bootstrap';
-import { ClipLoader } from 'react-spinners';
-import { CurrencyCard } from '../CurrencyCard/CurrencyCard';
-import './Dashboard.css';
+import PropTypes from 'prop-types';
 
-import bitcoinImg from './bitcoin.png';
-import litecoinImg from './litecoin.png';
-import ethereumImg from './ethereum.png';
+import { addCryptoCurrencies } from '../../store/actions';
+import { CardsList } from '../CardsList/CardsList'; 
+import './Dashboard.css';
 
 const http = axios.create({
   baseURL: `https://api.coinmarketcap.com/v2/`
 });
 
-export class Dashboard extends Component {
+class Dashboard extends Component {
   state = {
-    bitcoin: 0,
-    litecoin: 0,
-    ethereum: 0,
     countdown: 30,
     loading: false,
   }
   componentDidMount() {
     this.getCurrencies();
-
+    this.startInterval();
+  }
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+  startInterval() {
     this.interval = setInterval(() => {
       let countdown = this.state.countdown;
       countdown === 0 
@@ -37,9 +37,6 @@ export class Dashboard extends Component {
       }
     }, 1000);
   }
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
   getCurrencies() {
     this.setState({ loading: true })
     axios.all([
@@ -48,60 +45,80 @@ export class Dashboard extends Component {
       http.get(`ticker/1027/`)
     ])
     .then(axios.spread((bitcoin, litecoin, ethereum) => {
-      this.setState({ 
-        bitcoin: bitcoin.data.data.quotes.USD.price,
-        litecoin: litecoin.data.data.quotes.USD.price,
-        ethereum: ethereum.data.data.quotes.USD.price,
-        loading: false,
-      })
+      this.persistCryptoCurrencies(bitcoin, litecoin, ethereum);
+      this.setState({ loading: false });
     }))
     .catch(error => console.log(error));
   }
+  persistCryptoCurrencies(bitcoin, litecoin, ethereum) {
+    this.props.onAddCryptoCurrencies({
+      bitcoin: {
+        price: this.getCurrencyPrice(bitcoin),
+        color: this.getCurrencyColor(
+          this.props.cryptoCurrencies.bitcoin.price,
+          this.getCurrencyPrice(bitcoin)
+        ),
+      },
+      litecoin: {
+        price: this.getCurrencyPrice(litecoin),
+        color: this.getCurrencyColor(
+          this.props.cryptoCurrencies.litecoin.price,
+          this.getCurrencyPrice(litecoin)
+        ),
+      },
+      ethereum: {
+        price: this.getCurrencyPrice(ethereum),
+        color: this.getCurrencyColor(
+          this.props.cryptoCurrencies.ethereum.price,
+          this.getCurrencyPrice(ethereum)
+        ),
+      },
+    });
+  }
+  getCurrencyPrice(currency) {
+    return currency.data.data.quotes.USD.price;
+  }
+  getCurrencyColor(previous, current) {
+    let color = 'black';
+    if (previous !== 0) {
+      if (previous > current) {
+        color = 'red';
+      } else if (previous < current) {
+        color = 'green';        
+      }
+    }
+    return color;
+  }
   render() {
     return (
-      <div className="Dashboard">
-        { this.state.loading 
-          ? <div className="ClipLoader">
-              <ClipLoader
-                className="ClipLoader"
-                sizeUnit={"px"}
-                size={50}
-                color={'#CCCCC'}
-                loading={this.state.loading}
-              />              
-            </div>
-          : null
-        }
-        <Row>
-          <Col xs={6} md={4}>
-            <CurrencyCard
-              price={this.state.bitcoin}
-              image={bitcoinImg}
-              altName="bitcoin"
-              acronym="BTC"
-            />
-          </Col>
-          <Col xs={6} md={4}>
-            <CurrencyCard
-              price={this.state.ethereum}
-              image={ethereumImg}
-              altName="ethereum"
-              acronym="ETH"
-            />
-          </Col>
-          <Col xsHidden md={4}>
-            <CurrencyCard
-              price={this.state.litecoin}
-              image={litecoinImg}
-              altName="litecoin"
-              acronym="LTC"
-            />
-          </Col>
-        </Row>
-        <p className="App-subtext">
-          Prices refresh in { this.state.countdown } seconds.
-        </p>
-      </div>
+      <CardsList 
+        loading={this.state.loading}
+        countdown={this.state.countdown}
+        cryptoCurrencies={this.props.cryptoCurrencies}
+      />
     );
   }
 }
+
+Dashboard.propTypes = {
+  cryptoCurrencies: PropTypes.object,
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onAddCryptoCurrencies: cryptoCurrencies => {
+      dispatch(addCryptoCurrencies(cryptoCurrencies));
+    },
+  };
+};
+
+const mapStateToProps = state => {
+  return {
+    cryptoCurrencies: state.cryptoCurrencies,
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Dashboard);

@@ -8,7 +8,7 @@ export class CurrencyCard extends Component {
   render() {
     return (
       <Panel>
-      <Panel.Body>
+      <Panel.Body className={this.props.color}>
         <Currency
           quantity={this.props.price}
           currency="USD"
