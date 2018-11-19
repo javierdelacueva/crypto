@@ -2,11 +2,6 @@
   text-align: center;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-}
-
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -24,36 +19,6 @@
 
 .App-subtext {
   font-size: 2vh;
-}
-
-.App-card {
-  transition: 0.3s;
-  border-radius: 5px;
-  background: white;
-  color: #282c34;
-  padding: 15px;
-  min-height: 100px;
-  min-width: 250px;
-  position: relative;
-}
-.ClipLoader {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0; 
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  text-align: center;
-  padding: 60px;
-  background-color: rgba(0,0,0,0.5);
-}
-.panel-body {
-  min-width: 110px;
-}
-.panel-footer img {
-  margin-right: 5px;
 }
 
 @keyframes App-logo-spin {
